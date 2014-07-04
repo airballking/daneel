@@ -4,6 +4,26 @@
   (:use clojure.core.matrix.operators))
 
 ;;;
+;;; ALGORITHM TO CREATE ROTATION FROM AXIS/ANGLE TAKEN FROM:
+;;;
+;;; http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/
+;;;
+
+(defn rotation-from-axis-angle
+  "Creates a rotation matrix which corresponds to a rotation of 'angle' radians
+ around the 3d-axis 'axis'."
+  [axis rad-angle]
+  ;; TODO(Georg): throw exception if axis has length zero
+  ;;  (when (not (== 0 (length axis))))
+  (let [[x y z] (normalise axis)
+        c (Math/cos rad-angle)
+        s (Math/sin rad-angle)
+        t (- 1 c)]
+    [[(+ (* t x x) c) (- (* t x y) (* z s)) (+ (* t x z) (* y s))]
+     [(+ (* t x y) (* z s)) (+ (* t y y) c) (- (* t y z) (* x s))]
+     [(- (* t x z) (* y s)) (+ (* t y z) (* x s)) (+ (* t z z) c)]]))
+
+;;;
 ;;; QUATERNIONS are a different representation of rotations.
 ;;; Internally, we use rotation matrices to perform our computations.
 ;;; However, quaternions may be used as input and output
