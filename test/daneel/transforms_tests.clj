@@ -53,4 +53,15 @@
            {:x 0.0 :y 0.0 :z 1.0 :w 0.0}
            {:x 0.0 :y 1.0 :z 0.0 :w 0.0}
            {:x 1.0 :y 0.0 :z 0.0 :w 0.0}
-           {:x (Math/sin (Math/toRadians 22.5)) :y 0.0 :z 0.0 :w (Math/cos (Math/toRadians 22.5))}))))
+           {:x (Math/sin (Math/toRadians 22.5)) :y 0.0
+            :z 0.0 :w (Math/cos (Math/toRadians 22.5))}))))
+
+(deftest homogeneous-transform-basics
+  (testing "Creating and accessing homogeneous transforms."
+    (let [hom-transform-roundtrip
+          (comp (partial apply homogeneous-transform)
+                (partial apply concat)
+                dissect-homogeneous-transform)]
+      (are [T] (clojure.core.matrix/equals T (hom-transform-roundtrip T))
+           (clojure.core.matrix/identity-matrix 4)
+           [[1 2 3 4] [5 6 7 8] [9 10 11 12] [0 0 0 1]]))))

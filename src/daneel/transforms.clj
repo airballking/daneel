@@ -11,7 +11,7 @@
 
 (defn rotation-from-axis-angle
   "Creates a rotation matrix which corresponds to a rotation of 'angle' radians
- around the 3d-axis 'axis'."
+  around the 3d-axis 'axis'."
   [axis rad-angle]
   ;; TODO(Georg): throw exception if axis has length zero
   ;;  (when (not (== 0 (length axis))))
@@ -87,3 +87,26 @@
         :y (/ (+ m12 m21) s)
         :z (* 0.25 s)
         :w (/ (- m10 m01) s)}))))
+
+;;;
+;;; CREATING AND ACCESSING HOMOGENEOUS TRANSFORMS FROM ROTATION MATRIX
+;;; AND TRANSLATION VECTOR
+;;;
+
+(defn homogeneous-transform
+  "Creates a homogeneous transform from 3D rotation matrix and 3D translation
+  vector."
+  [& {:keys [rotation translation]
+      :or {rotation (identity-matrix 3)
+           translation (broadcast 0.0 [3 1])}}]
+  (->
+   (identity-matrix 4)
+   (set-selection (range 3) (range 3) rotation)
+   (set-selection (range 3) [3] translation)))
+
+(defn dissect-homogeneous-transform
+  "Returns the rotation matrix and translation vector of a homogeneous transform."
+  [transform]
+  (println "Fine.")
+  {:rotation (select transform (range 3) (range 3))
+   :translation (select transform (range 3) [3])})
