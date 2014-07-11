@@ -1,7 +1,8 @@
 (ns daneel.transforms
   (:refer-clojure :exclude [* - + == /])
   (:use clojure.core.matrix)
-  (:use clojure.core.matrix.operators))
+  (:use clojure.core.matrix.operators)
+  (:use daneel.utils))
 
 ;;;
 ;;; ALGORITHM TO CREATE ROTATION FROM AXIS/ANGLE TAKEN FROM:
@@ -98,14 +99,14 @@
   vector."
   [& {:keys [rotation translation]
       :or {rotation (identity-matrix 3)
-           translation (broadcast 0.0 [3 1])}}]
+           translation (broadcast 0.0 [3])}}]
   (->
    (identity-matrix 4)
    (set-selection (range 3) (range 3) rotation)
-   (set-selection (range 3) [3] translation)))
+   (set-selection (range 3) [3] (transpose-vector translation))))
 
 (defn dissect-homogeneous-transform
   "Returns the rotation matrix and translation vector of a homogeneous transform."
   [transform]
   {:rotation (select transform (range 3) (range 3))
-   :translation (select transform (range 3) [3])})
+   :translation (transpose-vector (select transform (range 3) [3]))})
