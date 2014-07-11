@@ -28,7 +28,7 @@
                  [s c 0]
                  [0 0 1]]))]
       ;; actual test cases following here
-      (are [matrix axis angle] (clojure.core.matrix/equals matrix (rotation-from-axis-angle axis angle))
+      (are [matrix axis angle] (clojure.core.matrix/equals matrix (axis-angle->rotation axis angle))
            ;; case 1: no rotation
            (clojure.core.matrix/identity-matrix 3) [0 0 1] 0
            ;; case 2: rotation around x
@@ -41,13 +41,13 @@
 (deftest quaternion-conversions
   (testing "Single conversions for identity quaternions and rotation matrices."
     (is (= {:x 0.0 :y 0.0 :z 0.0 :w 1.0}
-           (quaternion-from-rotation (clojure.core.matrix/identity-matrix 3))))
+           (rotation->quaternion (clojure.core.matrix/identity-matrix 3))))
     (is (clojure.core.matrix/equals
          (clojure.core.matrix/identity-matrix 3)
-         (rotation-from-quaternion {:x 0 :y 0 :z 0 :w 1}))))
+         (quaternion->rotation {:x 0 :y 0 :z 0 :w 1}))))
   (testing "Back and forth conversions between quaternions and rotation matrices"
     (let [quaternion-roundtrip
-          (comp quaternion-from-rotation rotation-from-quaternion)]
+          (comp rotation->quaternion quaternion->rotation)]
       (are [q] (= q (quaternion-roundtrip q))
            {:x 0.0 :y 0.0 :z 0.0 :w 1.0}
            {:x 0.0 :y 0.0 :z 1.0 :w 0.0}

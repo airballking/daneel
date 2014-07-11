@@ -9,7 +9,7 @@
 ;;; http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/
 ;;;
 
-(defn rotation-from-axis-angle
+(defn axis-angle->rotation
   "Creates a rotation matrix which corresponds to a rotation of 'angle' radians
   around the 3d-axis 'axis'."
   [axis rad-angle]
@@ -35,7 +35,7 @@
 ;;; http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 ;;;
 
-(defn rotation-from-quaternion
+(defn quaternion->rotation
   "Creates a rotation matrix from a quaternion."
   [{:keys [x y z w]}]
   (let [xx (* x x)
@@ -52,7 +52,7 @@
      [(+ xy2 zw2) (+ (- xx) yy (- zz) ww) (- yz2 xw2)]
      [(- xz2 yw2) (+ yz2 xw2) (+ (- xx) (- yy) zz ww)]]))
 
-(defn quaternion-from-rotation
+(defn rotation->quaternion
   "Creates a quaternion from a rotation matrix."
   [[[m00 m01 m02]
     [m10 m11 m12]
@@ -107,6 +107,5 @@
 (defn dissect-homogeneous-transform
   "Returns the rotation matrix and translation vector of a homogeneous transform."
   [transform]
-  (println "Fine.")
   {:rotation (select transform (range 3) (range 3))
    :translation (select transform (range 3) [3])})
