@@ -47,22 +47,3 @@
   it is a fixed joint."
   [{:keys [origin]}]
   origin)
-
-(defn forward-kinematics-solver
-  "Returns a forward kinematics function for 'joint'."
-  [joint]
-  (cond
-   (revolute-joint? joint) (revolute-joint-fk-solver joint)
-   (prismatic-joint? joint) (prismatic-joint-fk-solver joint)
-   (fixed-joint? joint) (fixed-joint-fk-solver joint))
-  ;; (case type
-  ;;   :revolute (comp
-  ;;               (partial mmul origin)
-  ;;               (partial homogeneous-transform :rotation)
-  ;;               (partial axis-angle->rotation axis))
-  ;;   :prismatic (comp
-  ;;               (partial mmul origin)
-  ;;               (partial homogeneous-transform :translation)
-  ;;               (partial * (normalise axis)))
-  ;;   :fixed (fn [_] origin))
-  )
