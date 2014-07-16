@@ -74,9 +74,3 @@
    (partial mmul origin)
    (partial homogeneous-transform :translation)
    (partial * (normalise axis))))
-
-(defn fixed-joint-fk-solver
-  "Returns the transform corresponding to the input joint, assuming that
-  it is a fixed joint."
-  [{:keys [origin]}]
-  origin)

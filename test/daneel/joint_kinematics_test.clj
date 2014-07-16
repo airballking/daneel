@@ -122,24 +122,3 @@
                 :rotation (axis-angle->rotation [0 0 1] Math/PI)
                 :translation [0.1 0.2 0.3])
        (homogeneous-transform :translation [0 0.05 0])))))
-
-(deftest fixed-joint-forward-kinematics-solver
-  (testing "FK solver for fixed joints."
-    (are [joint transform]
-      (equals transform (fixed-joint-fk-solver joint))
-      ;; TEST CASE 1
-      ;; joint description..
-      {:type :fixed :origin (identity-matrix 4)}
-      ;; joint transform..
-      (identity-matrix 4)
-      
-      ;; TEST CASE 2
-      ;; joint description..
-      {:type :fixed
-       :origin (homogeneous-transform
-                :rotation (axis-angle->rotation [0 0 1] Math/PI)
-                :translation [0.1 0.2 0.3])}
-      ;; joint transform..
-      (homogeneous-transform
-                :rotation (axis-angle->rotation [0 0 1] Math/PI)
-                :translation [0.1 0.2 0.3]))))
