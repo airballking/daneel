@@ -21,13 +21,6 @@
 ;;; TRANSPOSING VECTORS
 ;;;
 
-(defn transpose-vector
-  "Tranposes a vector 'v'."
-  [v]
-  (cond
-    (row-vector? v) (transpose-row-vector v)
-    (column-vector? v) (transpose-column-vector v)))
-
 (defn- transpose-row-vector
   "Transposes a column into a row vector."
   [v]
@@ -37,3 +30,10 @@
   "Transposes a row vector into a column vector."
   [v]
   (reduce (fn [result entry] (conj result (first entry))) [] v))
+
+(defn transpose-vector
+  "Tranposes a vector 'v'."
+  [v]
+  (cond
+    (row-vector? v) (transpose-row-vector v)
+    (column-vector? v) (transpose-column-vector v)))
