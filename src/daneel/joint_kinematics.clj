@@ -26,8 +26,24 @@
 
 (defn revolute-joint-fk-solver
   "Returns a function of arity 1 which corresponds to the forward kinematics
-  of the input joint, assuming that it is a revolute joint."
-  [{:keys [axis origin]}]
+  of a single revolute joint. 'axis' denotes the axis of rotation, and 'origin'
+  is a possible homogeneous transform offset between parent-frame and joint.
+
+  Example call to obtain the forward kinematics function (rotation around x,
+  no offset transformation):
+
+      daneel.joint-kinematics> (def revolute-fk
+                                 (revolute-joint-fk-solver
+                                   [1 0 0] (identity-matrix 4)))
+      #'daneel.joint-kinematics/revolute-fk
+
+  Subsequently, calling the fk function with a joint state of 45 degrees:
+      daneel.joint-kinematics> (revolute-fk (/ Math/PI 4))
+      [[1.0 0.0 0.0 0.0]
+       [0.0 0.7071067811865476 -0.7071067811865475 0.0]
+       [0.0 0.7071067811865475 0.7071067811865476 0.0]
+       [0.0 0.0 0.0 1.0]]"
+  [axis origin]
   (comp
    (partial mmul origin)
    (partial homogeneous-transform :rotation)
@@ -35,8 +51,25 @@
 
 (defn prismatic-joint-fk-solver
   "Returns a function of arity 1 which corresponds to the forward kinematics
-  of the input joint, assuming that it is a prismatic joint."
-  [{:keys [axis origin]}]
+  of a single prismatic joint. 'axis' denotes the axis of translation, and
+  'origin' is a possible homogeneous transform offset between parent-frame
+  and the joint.
+
+  Example call to obtain the forward kinematics function (translation along z,
+  no offset transformation):
+
+      daneel.joint-kinematics> (def prismatic-fk
+                                 (prismatic-joint-fk-solver
+                                   [0 0 1] (identity-matrix 4))
+      #'daneel.joint-kinematics/prismatic-fk
+
+  Subsequently, calling the fk function with a joint state of 5cm:
+      daneel.joint-kinematics> (prismatic-fk 0.05)
+      [[1.0 0.0 0.0 0.0]
+       [0.0 1.0 0.0 0.0]
+       [0.0 0.0 1.0 0.05]
+       [0.0 0.0 0.0 1.0]]"
+  [axis origin]
   (comp
    (partial mmul origin)
    (partial homogeneous-transform :translation)

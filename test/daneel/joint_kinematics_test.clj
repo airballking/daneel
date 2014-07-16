@@ -27,47 +27,53 @@
 
 (deftest revolute-joint-forward-kinematics-solvers
   (testing "FK solver: revolute joint with identity origin."
-    (are [joint joint-state transform]
-      (equals transform ((revolute-joint-fk-solver joint) joint-state))
+    (are [axis origin joint-state transform]
+      (equals transform ((revolute-joint-fk-solver axis origin) joint-state))
       ;; TEST 1
-      ;; joint description..
-      {:axis [1 0 0] :origin (identity-matrix 4)}
+      ;; joint rotation axis..
+      [1 0 0]
+      ;; joint origin..
+      (identity-matrix 4)
       ;; joint state..
       Math/PI
       ;; joint transform..
       (homogeneous-transform :rotation (axis-angle->rotation [1 0 0] Math/PI))
       
       ;; TEST 2
-      ;; joint description..
-      {:axis [0 0 1] :origin (identity-matrix 4)}
+      ;; joint rotation axis..
+      [0 0 1]
+      ;; joint origin..
+      (identity-matrix 4)
       ;; joint state..
       (- Math/PI)
       ;; joint transform..
       (homogeneous-transform :rotation (axis-angle->rotation [0 0 1] (- Math/PI)))))
   
   (testing "FK solver: revolute joint with non-identity origin."
-    (are [joint joint-state transform]
-      (equals transform ((revolute-joint-fk-solver joint) joint-state))
+    (are [axis origin joint-state transform]
+      (equals transform ((revolute-joint-fk-solver axis origin) joint-state))
       ;; TEST 1
-      ;; joint description
-      {:axis [0 1 0]
-       :origin (homogeneous-transform
-                :rotation (axis-angle->rotation [0 0 1] Math/PI)
-                :translation [0.1 0.2 0.3])}
-      ;; joint state
+      ;; joint rotation axis..
+      [0 1 0]
+      ;; joint origin..
+      (homogeneous-transform
+       :rotation (axis-angle->rotation [0 0 1] Math/PI)
+       :translation [0.1 0.2 0.3])
+      ;; joint state..
       (/ Math/PI 4)
-      ;; joint transform
+      ;; joint transform..
       (mmul
        (homogeneous-transform :rotation (axis-angle->rotation [0 0 1] Math/PI)
                               :translation [0.1 0.2 0.3])
        (homogeneous-transform :rotation (axis-angle->rotation [0 1 0] (/ Math/PI 4))))
 
       ;; TEST 2
-      ;; joint description
-      {:axis [1 1 1]
-       :origin (homogeneous-transform
-                :rotation (axis-angle->rotation [-1 0 1] (/ Math/PI 4))
-                :translation [0.1 0.2 0.3])}
+      ;; joint rotation axis..
+      [1 1 1]
+      ;; joint origin..
+      (homogeneous-transform
+       :rotation (axis-angle->rotation [-1 0 1] (/ Math/PI 4))
+       :translation [0.1 0.2 0.3])
       ;; joint state
       (/ Math/PI 16)
       ;; joint transform
@@ -78,31 +84,36 @@
 
 (deftest prismatic-joint-forward-kinematics-solver
   (testing "FK solver: prismatic joint with identity origin."
-   (are [joint joint-state transform]
-     (equals transform ((prismatic-joint-fk-solver joint) joint-state))
+   (are [axis origin joint-state transform]
+     (equals transform ((prismatic-joint-fk-solver axis origin) joint-state))
      ;; TEST CASE 1
-     ;; joint description..
-     {:axis [0 0 1] :origin (identity-matrix 4)}
+     ;; joint axis..
+     [0 0 1]
+     ;; joint origin..
+     (identity-matrix 4)
      ;; joint state..
      0.05
      ;; joint transform..
      (homogeneous-transform :translation [0 0 0.05])
      
      ;; TEST CASE 2
-     ;; joint description..
-     {:axis [1 1 0] :origin (identity-matrix 4)}
+     ;; joint axis..
+     [1 1 0]
+     ;; joint origin..
+     (identity-matrix 4)
      ;; joint state..
      (- 0.15)
      ;; joint transform..
      (homogeneous-transform :translation (* (- 0.15) (normalise [1 1 0])))))
   (testing "FK solver: prismatic joint with non-identity origin."
-    (are [joint joint-state transform]
-      (equals transform ((prismatic-joint-fk-solver joint) joint-state))
-      ;; joint description..
-      {:axis [0 1 0]
-       :origin (homogeneous-transform
-                :rotation (axis-angle->rotation [0 0 1] Math/PI)
-                :translation [0.1 0.2 0.3])}
+    (are [axis origin joint-state transform]
+      (equals transform ((prismatic-joint-fk-solver axis origin) joint-state))
+      ;; joint axis..
+      [0 1 0]
+      ;; joint origin
+      (homogeneous-transform
+       :rotation (axis-angle->rotation [0 0 1] Math/PI)
+       :translation [0.1 0.2 0.3])
       ;; joint state..
       0.05
       ;; joint transform..
