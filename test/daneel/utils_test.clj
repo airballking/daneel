@@ -29,3 +29,11 @@
          [1 0 0] [[1] [0] [0]]
          [[1] [2]] [1 2]
          [0] [[0]])))
+
+(deftest skew-matrix-creation
+  (testing "Creation of skew matrices."
+    (are [v1 v2] (clojure.core.matrix/equals
+                  (clojure.core.matrix/cross v1 v2)
+                  (clojure.core.matrix/mmul (skew-matrix v1) v2))
+         [1 1 1] [2 2 2]
+         [1 0 1] [-1 2 -3])))

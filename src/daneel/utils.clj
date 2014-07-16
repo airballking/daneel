@@ -37,3 +37,14 @@
   (cond
     (row-vector? v) (transpose-row-vector v)
     (column-vector? v) (transpose-column-vector v)))
+
+;;;
+;;; SKEW MATRIX CREATION
+;;;
+
+(defn skew-matrix
+  "Returns the skew-matrix of a 3D vector."
+  [[x y z]]
+  [[0 (- z) y]
+   [z 0 (- x)]
+   [(- y) x 0]])
