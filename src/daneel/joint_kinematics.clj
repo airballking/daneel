@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [* - + == /])
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.operators)
-  (:use daneel.transforms))
+  (:use daneel.transforms)
+  (:use daneel.twists))
 
 ;;;
 ;;; PREDICATES TO CHECK FOR JOINT TYPES
@@ -73,4 +74,66 @@
   (comp
    (partial mmul origin)
    (partial homogeneous-transform :translation)
+   (partial * (normalise axis))))
+
+;;;
+;;; INSTANTANEOUS TWIST SOLVERS
+;;;
+
+(defn prismatic-joint-twist-solver
+  "Returns a function of a arity 1 which corresponds to the forward instantaneous
+  kinematics of a prismatic joint. 'axis' is the translation axis of the joint, and
+  'origin' denotes a possible offset transform from the parent frame of the joint to
+  the actual joint.
+
+  NOTE: 'axis' will be normalised, i.e. the joint will have unit scale.
+
+  To obtain the instantaneous twist for a specific joint state, just call the resulting
+  function with the joint state value.
+
+  EXAMPLE CALL:
+    translation along-z; a 90deg offset rotation around the x-axis of the parent frame:
+      daneel.joint-kinematics> (def prismatic-twist
+                                 (prismatic-joint-twist-solver
+                                   [0 0 2]
+                                   (homogeneous-transform
+                                     :rotation (axis-angle->rotation [1 0 0] (/ Math/PI 2)))))
+      #'daneel.joint-kinematics/prismatic-twist
+
+    obtaining the jacobian for a joint-state of 5cm:
+      daneel.joint-kinematics> (prismatic-twist 0.05)
+      [0.0 0.0 0.0 0.0 -0.05 0.0]"
+  [axis origin]
+  (comp
+   (partial mmul (pluecker-transform origin))
+   (partial twist :translation)
+   (partial * (normalise axis))))
+
+(defn revolute-joint-twist-solver
+  "Returns a function of a arity 1 which corresponds to the forward instantaneous
+  kinematics of a revolute joint. 'axis' is the rotation axis of the joint, and
+  'origin' denotes a possible offset transform from the parent frame of the joint to
+  the actual joint.
+
+  NOTE: 'axis' will be normalised, i.e. the joint will have unit scale.
+
+  To obtain the instantaneous twist for a specific joint state, just call the resulting
+  function with the joint state value.
+
+  EXAMPLE CALL:
+    rotation around y; a 90deg offset rotation around the z-axis of the parent frame:
+      daneel.joint-kinematics> (def revolute-twist
+                                 (revolute-joint-twist-solver
+                                   [0 1 0]
+                                   (homogeneous-transform
+                                     :rotation (axis-angle->rotation [0 0 1] (/ Math/PI 2)))))
+      #'daneel.joint-kinematics/revolute-twist
+
+    obtaining the jacobian for a joint-state of 45deg:
+      daneel.joint-kinematics> (revolute-twist (/ Math/PI 4))
+      [-0.7854 0.0 0.0 0.0 0.0 0.0]"
+  [axis origin]
+  (comp
+   (partial mmul (pluecker-transform origin))
+   (partial twist :angular)
    (partial * (normalise axis))))

@@ -122,3 +122,49 @@
                 :rotation (axis-angle->rotation [0 0 1] Math/PI)
                 :translation [0.1 0.2 0.3])
        (homogeneous-transform :translation [0 0.05 0])))))
+
+(deftest single-joint-instantaneous-twist-solving
+  (testing "Prismatic joint twist solver"
+    (are [axis origin
+          joint-state inst-twist
+          epsilon]
+      (equals inst-twist ((prismatic-joint-twist-solver axis origin) joint-state) epsilon)
+      ;; CASE 1: without any offset
+      [1 0 0] (identity-matrix 4)
+      0.05 [0.0 0.0 0.0 0.05 0.0 0.0]
+      ;; TODO(Georg): introduce global constant 
+      1E-17
+
+      ;; CASE 2: with rotation offset
+      [0 0 2] (homogeneous-transform :rotation (axis-angle->rotation [1 0 0] (/ Math/PI 2)))
+      0.05 [0.0 0.0 0.0 0.0 -0.05 0.0]
+      ;; TODO(Georg): introduce global constant 
+      1E-17
+
+      ;; CASE 3: with translation offset
+      [0 0 1] (homogeneous-transform :translation [1 1 1])
+      0.05 [0.0 0.0 0.0 0.0 0.0 0.05]
+      ;; TODO(Georg): introduce global constant 
+      1E-17))
+  (testing "Revolute joint twist solver"
+    (are [axis origin
+          joint-state inst-twist
+          epsilon]
+      (equals inst-twist ((revolute-joint-twist-solver axis origin) joint-state) epsilon)
+      ;; CASE 1: without rotation offset
+      [0 1 0] (identity-matrix 4)
+      (/ Math/PI 2) [0.0 (/ Math/PI 2) 0.0 0.0 0.0 0.0]
+      ;; TODO(Georg): introduce global constant
+      1E-16
+      
+      ;; CASE 2: with rotation offset
+      [0 1 0] (homogeneous-transform :rotation (axis-angle->rotation [0 0 1] (/ Math/PI 2)))
+      (/ Math/PI 4) [(- (/ Math/PI 4)) 0.0 0.0 0.0 0.0 0.0]
+      ;; TODO(Georg): introduce global constant
+      1E-16
+
+      ;; CASE 3: with translation offset
+      [0 1 0] (homogeneous-transform :translation [0 0 1])
+      (/ Math/PI 4) [0.0 (/ Math/PI 4) 0.0 (- (/ Math/PI 4)) 0.0 0.0]
+      ;; TODO(Georg): introduce global constant
+      1E-16)))
