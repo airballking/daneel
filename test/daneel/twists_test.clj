@@ -31,7 +31,7 @@
       [0.0 0.0 0.0 1.0 1.0 1.0] [0.0 0.0 0.0] [1.0 1.0 1.0])))
 
 (deftest pluecker-transform-creation
-  (testing "Creation of pluecker transforms"
+  (testing "Creation of pluecker transforms from rotation and translation"
     (are [rotation translation pluecker]
       (equals (pluecker-transform rotation translation) pluecker)
       ;; case 1: all nothing
@@ -47,4 +47,28 @@
        [0 0 1 0 0 0]
        [0 -1 1 1 0 0]
        [1 0 -1 0 1 0]
-       [-1 1 0 0 0 1]])))
+       [-1 1 0 0 0 1]]))
+  (testing "Creating pluecker transform from homogeneous transforms"
+    ;; TODO(Georg): introduce global constant for epsilon
+    (are [hom-transform pluecker] (equals pluecker (pluecker-transform hom-transform) 1E-16)
+         ;; CASE 1: identity transforms
+         (identity-matrix 4) (identity-matrix 6)
+         ;; CASE 2: sanity check with all zeros
+         (zero-matrix 4 4) (zero-matrix 6 6)
+         ;; CASE 3: some translation
+         (daneel.transforms/homogeneous-transform :translation [1 1 1])
+         [[1 0 0 0 0 0]
+          [0 1 0 0 0 0]
+          [0 0 1 0 0 0]
+          [0 -1 1 1 0 0]
+          [1 0 -1 0 1 0]
+          [-1 1 0 0 0 1]]
+         ;; CASE 4: some rotation
+         (daneel.transforms/homogeneous-transform :rotation (daneel.transforms/axis-angle->rotation [1 0 0] (/ Math/PI 2)))
+         [[1 0 0 0 0 0]
+          [0 0 -1 0 0 0]
+          [0 1 0 0 0 0]
+          [0 0 0 1 0 0]
+          [0 0 0 0 0 -1]
+          [0 0 0 0 1 0]]
+         )))

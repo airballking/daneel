@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [* - + == /])
   (:use clojure.core.matrix)
   (:use clojure.core.matrix.operators)
-  (:use daneel.utils))
+  (:use daneel.utils)
+  (:use daneel.transforms))
 
 ;;;
 ;;; CREATION AND DISSECTION OF TWISTS
@@ -36,9 +37,13 @@
 (defn pluecker-transform
   "Returns the Pluecker transform corresponding to rotation matrix 'rotation' and
   3D translation vector 'translation'."
-  [rotation translation]
-  (->
-   (zero-matrix 6 6)
-   (set-selection (range 3) (range 3) rotation)
-   (set-selection (range 3 6) (range 3 6) rotation)
-   (set-selection (range 3 6) (range 3) (mmul (skew-matrix translation) rotation))))
+  ([hom-transform]
+     (let [{:keys [rotation translation]}
+           (dissect-homogeneous-transform hom-transform)]
+       (pluecker-transform rotation translation)))
+  ([rotation translation]
+     (->
+      (zero-matrix 6 6)
+      (set-selection (range 3) (range 3) rotation)
+      (set-selection (range 3 6) (range 3 6) rotation)
+      (set-selection (range 3 6) (range 3) (mmul (skew-matrix translation) rotation)))))
